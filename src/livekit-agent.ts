@@ -1,6 +1,8 @@
 import { type JobContext, defineAgent, llm, multimodal } from '@livekit/agents';
 import * as openai from '@livekit/agents-plugin-openai';
 import { z } from 'zod';
+import UserModel, { type User } from './models/User.js';
+import { constructPrompt } from './prompts/characters.js';
 
 // Weather function context
 const weatherFunction = {
@@ -35,10 +37,15 @@ export const livekitAgent = defineAgent({
     console.log('✅ Participant joined:', participant.identity);
     console.log(`🤖 Starting multimodal assistant agent for ${participant.identity}`);
 
+    const userId = participant.identity.split('voice_assistant_user_')[1];
+    const user = await UserModel.findOne({ id: userId });
+
+    console.log('👤 User:', user);
+
     // Initialize the OpenAI realtime model
     const model = new openai.realtime.RealtimeModel({
-      instructions:
-        'You are a helpful assistant. You can help with various tasks and provide weather information when requested.',
+      instructions: constructPrompt(user?.character || 'bunny', user as User),
+      voice: 'alloy',
     });
 
     // Create function context with weather function
@@ -58,7 +65,7 @@ export const livekitAgent = defineAgent({
     session.conversation.item.create(
       llm.ChatMessage.create({
         role: llm.ChatRole.ASSISTANT,
-        text: 'Hello! How can I help you today? I can assist with various tasks and even provide weather information if you need it.',
+        text: 'Hello! How are you today? What is going on?',
       }),
     );
 

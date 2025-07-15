@@ -4,14 +4,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface User {
   id: string; // name to lowercase and spaces converted to hyphens
   name: string;
-  character: 'bunny' | 'cat' | 'dog' | 'fox' | 'tiger' | 'giraffe';
+  character: 'bunny' | 'cat' | 'dog' | 'giraffe' | 'penguin';
 }
 
 // Mongoose document interface
 export interface UserDocument extends Document {
   id: string;
   name: string;
-  character: 'bunny' | 'cat' | 'dog' | 'fox' | 'tiger' | 'giraffe';
+  character: 'bunny' | 'cat' | 'dog' | 'giraffe' | 'penguin';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,7 +35,7 @@ const userSchema = new Schema<UserDocument>(
     character: {
       type: String,
       required: true,
-      enum: ['bunny', 'cat', 'dog', 'fox', 'tiger', 'giraffe'],
+      enum: ['bunny', 'cat', 'dog', 'giraffe', 'penguin'],
     },
   },
   {

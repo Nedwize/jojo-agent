@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 // Character enum validation
-export const characterSchema = z.enum(['bunny', 'cat', 'dog', 'fox', 'tiger', 'giraffe'], {
+export const characterSchema = z.enum(['bunny', 'cat', 'dog', 'giraffe', 'penguin'], {
   errorMap: (issue, ctx) => ({
-    message: `Character must be one of: bunny, cat, dog, fox, tiger, giraffe. Received: ${ctx.data}`,
+    message: `Character must be one of: bunny, cat, dog, giraffe, penguin. Received: ${ctx.data}`,
   }),
 });
 
