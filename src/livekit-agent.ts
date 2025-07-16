@@ -3,29 +3,7 @@ import * as openai from '@livekit/agents-plugin-openai';
 import { z } from 'zod';
 import UserModel, { type User } from './models/User.js';
 import { constructPrompt } from './prompts/characters.js';
-
-// Weather function context
-const weatherFunction = {
-  description: 'Get the weather in a location',
-  parameters: z.object({
-    location: z.string().describe('The location to get the weather for'),
-  }),
-  execute: async ({ location }: { location: string }) => {
-    console.debug(`executing weather function for ${location}`);
-
-    try {
-      const response = await fetch(`https://wttr.in/${location}?format=%C+%t`);
-      if (!response.ok) {
-        throw new Error(`Weather API returned status: ${response.status}`);
-      }
-      const weather = await response.text();
-      return `The weather in ${location} right now is ${weather}.`;
-    } catch (error) {
-      console.error('Weather API error:', error);
-      return `Sorry, I couldn't get the weather information for ${location}. Please try again later.`;
-    }
-  },
-};
+import { createEpisodicMemoryFunction } from './tools/create-episodic-memory.js';
 
 // Define the LiveKit agent
 export const livekitAgent = defineAgent({
@@ -50,7 +28,7 @@ export const livekitAgent = defineAgent({
 
     // Create function context with weather function
     const fncCtx: llm.FunctionContext = {
-      weather: weatherFunction,
+      createEpisodeMemory:  createEpisodicMemoryFunction,
     };
 
     // Create the multimodal agent

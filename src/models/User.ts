@@ -64,15 +64,6 @@ userSchema.methods.toJSON = function () {
   return userObject;
 };
 
-// Static methods
-userSchema.statics.findByCharacter = function (character: string) {
-  return this.find({ character });
-};
-
-userSchema.statics.findByName = function (name: string) {
-  return this.findOne({ name });
-};
-
 // Create and export the User model
 export const UserModel = mongoose.model<UserDocument>('User', userSchema);
 
