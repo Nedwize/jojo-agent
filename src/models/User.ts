@@ -5,6 +5,7 @@ export interface User {
   id: string; // name to lowercase and spaces converted to hyphens
   name: string;
   character: 'bunny' | 'cat' | 'dog' | 'giraffe' | 'penguin';
+  notes: string[];
 }
 
 // Mongoose document interface
@@ -14,6 +15,7 @@ export interface UserDocument extends Document {
   character: 'bunny' | 'cat' | 'dog' | 'giraffe' | 'penguin';
   createdAt: Date;
   updatedAt: Date;
+  notes: string[];
 }
 
 // Define the User schema
@@ -36,6 +38,12 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: true,
       enum: ['bunny', 'cat', 'dog', 'giraffe', 'penguin'],
+    },
+    notes: {
+      type: [String],
+      required: false,
+      trim: true,
+      maxlength: 5000,
     },
   },
   {

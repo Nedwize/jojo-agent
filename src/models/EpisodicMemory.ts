@@ -11,6 +11,7 @@ export interface EpisodicMemory {
 
 // Mongoose document interface
 export interface EpisodicMemoryDocument extends Document {
+  userId: string;
   eventType: 'user_message' | 'inferred_result';
   summary: string;
   details: string;
@@ -23,6 +24,11 @@ export interface EpisodicMemoryDocument extends Document {
 // Define the EpisodicMemory schema
 const episodicMemorySchema = new Schema<EpisodicMemoryDocument>(
   {
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
     eventType: {
       type: String,
       required: true,
@@ -72,19 +78,6 @@ episodicMemorySchema.methods.toJSON = function () {
   delete memoryObject._id;
   delete memoryObject.__v;
   return memoryObject;
-};
-
-// Static methods
-episodicMemorySchema.statics.findByEventType = function (eventType: string) {
-  return this.find({ eventType }).sort({ timestamp: -1 });
-};
-
-episodicMemorySchema.statics.findByActor = function (actor: string) {
-  return this.find({ actor }).sort({ timestamp: -1 });
-};
-
-episodicMemorySchema.statics.findRecent = function (limit: number = 10) {
-  return this.find().sort({ timestamp: -1 }).limit(limit);
 };
 
 episodicMemorySchema.statics.findByDateRange = function (startDate: Date, endDate: Date) {

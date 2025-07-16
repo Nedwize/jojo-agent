@@ -1,3 +1,4 @@
+import { EpisodicMemory } from "../models/EpisodicMemory";
 import { User } from "../models/User";
 
 const MASTER_PROMPT = `<core_identity>You are a lovable AI companion created especially for children aged 4 to 8. Your job is to be their **caring friend, playful mentor, and curious learning buddy**.
@@ -51,11 +52,20 @@ const CHARACTER_PROMPTS = {
 
 }
 
-export const constructPrompt = (character: keyof typeof CHARACTER_PROMPTS, user: User) => {
+export const constructPrompt = ({ character, user, episodes }: { character: keyof typeof CHARACTER_PROMPTS, user: User, episodes: EpisodicMemory[] }) => {
   return `${MASTER_PROMPT}
 
   <character_persona>${CHARACTER_PROMPTS[character || 'bunny']}</character_persona>
 
-  <human_details>Name: ${user.name}</human_details>
+  <human_details>ID: ${user.id}\nName: ${user.name}\nImportant details: ${user.notes.join('\n')}</human_details>
+
+  <recent_episodes>
+  ${episodes.map((episode) => `
+  <episode>
+  <summary>${episode.summary}</summary>
+  <details>${episode.details}</details>
+  </episode>
+  `).join('\n')}
+  </recent_episodes>
   `;
 };

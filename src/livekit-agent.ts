@@ -1,9 +1,12 @@
 import { type JobContext, defineAgent, llm, multimodal } from '@livekit/agents';
 import * as openai from '@livekit/agents-plugin-openai';
-import { z } from 'zod';
 import UserModel, { type User } from './models/User.js';
 import { constructPrompt } from './prompts/characters.js';
 import { createEpisodicMemoryFunction } from './tools/create-episodic-memory.js';
+import { createCoreMemoryFunction } from './tools/create-core-memory.js';
+import { createSemanticMemoryFunction } from './tools/create-semantic-memory.js';
+import { getSemanticMemoryByKeywordFunction } from './tools/get-semantic-by-keyword.js';
+import EpisodicMemoryModel from './models/EpisodicMemory.js';
 
 // Define the LiveKit agent
 export const livekitAgent = defineAgent({
@@ -17,18 +20,25 @@ export const livekitAgent = defineAgent({
 
     const userId = participant.identity.split('voice_assistant_user_')[1];
     const user = await UserModel.findOne({ id: userId });
+    const episodes = await EpisodicMemoryModel.find({ userId }).sort({ timestamp: -1 }).limit(10);
 
     console.log('👤 User:', user);
+    console.log('🔖 Episodes:', episodes);
+    const prompt = constructPrompt({ character: user?.character || 'bunny', user: user as User, episodes });
+    console.log('🔖 Prompt:', prompt);
 
     // Initialize the OpenAI realtime model
     const model = new openai.realtime.RealtimeModel({
-      instructions: constructPrompt(user?.character || 'bunny', user as User),
+      instructions: prompt,
       voice: 'alloy',
     });
 
     // Create function context with weather function
     const fncCtx: llm.FunctionContext = {
       createEpisodeMemory:  createEpisodicMemoryFunction,
+      createCoreMemory: createCoreMemoryFunction,
+      createSemanticMemory: createSemanticMemoryFunction,
+      getSemanticMemoryByKeyword: getSemanticMemoryByKeywordFunction,
     };
 
     // Create the multimodal agent
